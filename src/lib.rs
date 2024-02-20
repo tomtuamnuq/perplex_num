@@ -1,6 +1,5 @@
 mod perplex;
 mod repr_as_matrix;
-pub use nalgebra::RealField;
 pub use perplex::Perplex;
 pub use repr_as_matrix::PerplexMatrixForm;
 #[cfg(test)]
