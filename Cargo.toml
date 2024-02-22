@@ -7,3 +7,10 @@ edition = "2021"
 approx = "0.5.1"
 nalgebra = "0.32.3"
 num-traits = "0.2.18"
+
+[dev-dependencies]
+criterion = "0.5"
+
+[[bench]]
+name = "multiplication"
+harness = false
