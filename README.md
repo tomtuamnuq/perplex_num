@@ -18,12 +18,18 @@ The perplex numbers form an algebraic ring with addition and multiplication (see
 Let $z=t+xh$ be a perplex number:
 - **Conjugate** of a perplex number is: $$\bar z = t - xh$$
 - **Squared Distance** is defined by the quadratic form $D$, and can be negative: $$D(z)=z\bar z = t^2-x^2$$
-- **Modulus (Norm)** is the square root of the absolute value of $D(z)\in \mathbb R $: $$\vert z \vert = \sqrt{\vert D(z) \vert}$$
+- **Modulus (magnitude)** is the square root of the absolute value of $D(z)\in \mathbb R $: $$\vert z \vert = \sqrt{\vert D(z) \vert}$$
 - **Inverse** $z^{-1}=\frac{1}{z}$ is the perplex number that multiplies to the neutral element of multiplication ($zz^{-1}=1$). It is given by: $$ z^{-1} =  \frac{\bar z}{D(z)} = \frac{t - xh}{t^2-x^2}$$
 
-**TODO** space time and light-like
+Perplex numbers include elements called null vectors or **zero divisors**, which are of the form $x+xh$ or $x-xh$, with $x\not=0$. These are exactly the non-zero elements with a modulus of zero. These numbers are not invertible, meaning they do not have a multiplicative inverse within the set of perplex numbers.
 
-Perplex numbers include elements called null vectors or zero divisors, which are of the form $x+xh$ or $x-xh$, with $x\not=0$. These are exactly the non-zero elements with a modulus of zero. These numbers are not invertible, meaning they do not have a multiplicative inverse within the set of perplex numbers.
+### Time-, Space- or Light-Like
+A categorization of perplex numbers based on the squared distance is crucial for understanding the domains of functions defined over these numbers. A number is:
+- **time**-like if D(z) > 0
+- **space**-like if D(z) < 0
+- **light**-like if D(z) = 0
+
+The inversion of a perplex number, for instance, is only defined for time- or space-like numbers [Fundamental Theorems of Algebra for the Perplexes](https://doi.org/10.4169/074683409X475643).
 
 ### Matrix Representation
 
@@ -45,6 +51,7 @@ perplex_num = "0.1"
 
 ## Bibliography
 - [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6)
+- [Hyperbolic trigonometry in two-dimensional space-time geometry](https://doi.org/10.1393/ncb/i2003-10012-9)
 - [Fundamental Theorems of Algebra for the Perplexes](https://doi.org/10.4169/074683409X475643)
 - [Introduction to Hybrid Numbers](https://doi.org/10.1007/s00006-018-0833-3)
-
+- [New characterizations of the ring of the split-complex numbers and the field C of complex numbers and their comparative analyses](https://doi.org/10.48550/arXiv.2305.04586)

@@ -38,29 +38,65 @@ mod tests {
             "Argument is not defined for light-like numbers!"
         );
         assert!(
+            z.klein().is_none(),
+            "Klein is not defined for light-like numbers!"
+        );
+        assert!(
             z.to_polar().is_none(),
             "Polar form is not defined for light-like numbers!"
         );
 
-        let z = Perplex::new(2.0, 1.0);
+        let z = Perplex::new(2.0, 1.0); // Right-Sector
         assert!(z.is_time_like(), "2 + h is time-like!");
         assert_ne!(z.arg().unwrap(), 0.0, "2 + h has a non-zero argument!");
-        let (rho, theta) = z.to_polar().unwrap();
-        assert_abs_diff_eq!(z, Perplex::from_polar(rho, theta));
+        assert_eq!(
+            z.klein().unwrap(),
+            Perplex::new(1.0, 0.0),
+            "2 + h is in the right-sector!"
+        );
+        let (rho, theta, klein) = z.to_polar().unwrap();
+        assert_abs_diff_eq!(z, Perplex::from_polar(rho, theta, klein));
 
-        let z = Perplex::new(1.0, 2.0);
+        let z = Perplex::new(-2.0, 1.0); // Left-Sector
+        assert!(z.is_time_like(), "-2 + h is time-like!");
+        assert_ne!(z.arg().unwrap(), 0.0, "-2 + h has a non-zero argument!");
+        assert_eq!(
+            z.klein().unwrap(),
+            Perplex::new(-1.0, 0.0),
+            "-2 + h is in the left-sector!"
+        );
+        let (rho, theta, klein) = z.to_polar().unwrap();
+        assert_abs_diff_eq!(z, Perplex::from_polar(rho, theta, klein));
+
+        let z = Perplex::new(1.0, 2.0); // Up-Sector
         assert!(z.is_space_like(), "1 + 2h is space-like!");
         assert_ne!(z.arg().unwrap(), 0.0, "1 + 2h has a non-zero argument!");
-        let (rho, theta) = z.to_polar().unwrap();
-        assert_abs_diff_eq!(z, Perplex::from_polar(rho, theta));
+        assert_eq!(
+            z.klein().unwrap(),
+            Perplex::new(0.0, 1.0),
+            "1 + 2h is in the up-sector!"
+        );
+        let (rho, theta, klein) = z.to_polar().unwrap();
+        assert_abs_diff_eq!(z, Perplex::from_polar(rho, theta, klein));
+
+        let z = Perplex::new(1.0, -2.0); // Down-Sector
+        assert!(z.is_space_like(), "1 - 2h is space-like!");
+        assert_ne!(z.arg().unwrap(), 0.0, "1 - 2h has a non-zero argument!");
+        assert_eq!(
+            z.klein().unwrap(),
+            Perplex::new(0.0, -1.0),
+            "1 - 2h is in the down-sector!"
+        );
+        let (rho, theta, klein) = z.to_polar().unwrap();
+        assert_abs_diff_eq!(z, Perplex::from_polar(rho, theta, klein));
 
         let z = Perplex::cis(f64::PI() / 2.0);
-        let (rho, theta) = z.to_polar().unwrap();
-        assert_abs_diff_eq!(z, Perplex::from_polar(rho, theta));
+        let (rho, theta, klein) = z.to_polar().unwrap();
+        assert_abs_diff_eq!(z, Perplex::from_polar(rho, theta, klein), epsilon = 0.00001);
     }
     #[test]
     fn test_logarithm_exponential() {
-        let z = Perplex::new(2.0, 1.0);
+        let z = Perplex::new(2.0, 1.0); // Right-Sector
         let ln_result = z.ln();
         assert!(
             ln_result.is_some(),
@@ -69,7 +105,16 @@ mod tests {
         let z_ln_exp = ln_result.unwrap().exp();
         assert_abs_diff_eq!(z_ln_exp, z);
 
-        let z = Perplex::new(1.0, 2.0);
+        let z = Perplex::new(-2.0, 1.0); // Left-Sector
+        let ln_result = z.ln();
+        assert!(
+            ln_result.is_some(),
+            "Natural logarithm is defined for time-like -2 + h!"
+        );
+        let z_ln_exp = ln_result.unwrap().exp();
+        assert_abs_diff_eq!(z_ln_exp, z);
+
+        let z = Perplex::new(1.0, 2.0); // Up-Sector
         let ln_result = z.ln();
         assert!(
             ln_result.is_some(),
@@ -77,13 +122,26 @@ mod tests {
         );
         let z_ln_exp = ln_result.unwrap().exp();
         assert_abs_diff_eq!(z_ln_exp, z);
+
+        let z = Perplex::new(1.0, -2.0); // Down-Sector
+        let ln_result = z.ln();
+        assert!(
+            ln_result.is_some(),
+            "Natural logarithm is defined for space-like 1 - 2h!"
+        );
+        let z_ln_exp = ln_result.unwrap().exp();
+        assert_abs_diff_eq!(z_ln_exp, z);
     }
     #[test]
     fn test_exponential_logarithm() {
-        let z = Perplex::new(2.0, 1.0);
+        let z = Perplex::new(2.0, 1.0); // Right-Sector
         assert_abs_diff_eq!(z.exp().ln().unwrap(), z);
-        let z = Perplex::new(1.0, 2.0);
+        let z = Perplex::new(-2.0, 1.0); // Left-Sector
         assert_abs_diff_eq!(z.exp().ln().unwrap(), z);
+        let z = Perplex::new(1.0, 2.0); // Up-Sector
+        assert_abs_diff_eq!(z.exp().ln().unwrap(), z, epsilon = 0.00001);
+        let z = Perplex::new(1.0, -2.0); // Down-Sector
+        assert_abs_diff_eq!(z.exp().ln().unwrap(), z, epsilon = 0.00001);
     }
 
     #[test]
