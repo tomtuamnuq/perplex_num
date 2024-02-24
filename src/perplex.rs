@@ -104,7 +104,21 @@ impl<T: Copy + Num + Neg<Output = T>> Perplex<T> {
 }
 
 impl<T: Copy + Float> Perplex<T> {
-    // TODO L1-Norm of a Perplex number given by Manhattan distance?
+    /// Returns the L1 norm `|t| + |x|` (Manhattan distance) from the origin in the cartesian coordinate plane, see Eq. 2.49 in [New characterizations of the ring of the split-complex numbers and the field C of complex numbers and their comparative analyses](https://doi.org/10.48550/arXiv.2305.04586).
+    #[inline]
+    pub fn l1_norm(&self) -> T {
+        self.t.abs() + self.x.abs()
+    }
+    /// Returns the L2 norm `|t^2| + |x^2|` (Euclidean distance) from the origin in the cartesian coordinate plane, see Eq. 2.50 in [New characterizations of the ring of the split-complex numbers and the field C of complex numbers and their comparative analyses](https://doi.org/10.48550/arXiv.2305.04586).
+    #[inline]
+    pub fn l2_norm(&self) -> T {
+        (self.t * self.t + self.x * self.x).sqrt()
+    }
+    /// Returns the maximum norm `||z||_∞ = max(|t|, |x|)` from the origin in the cartesian coordinate plane, see Eq. 2.51 in [New characterizations of the ring of the split-complex numbers and the field C of complex numbers and their comparative analyses](https://doi.org/10.48550/arXiv.2305.04586).
+    #[inline]
+    pub fn max_norm(&self) -> T {
+        self.t.abs().max(self.x.abs())
+    }
 
     /// Returns the modulus of ˋselfˋ.
     #[inline]
@@ -175,53 +189,31 @@ impl<T: Copy + Float> Perplex<T> {
         self.arg()
             .map(|theta| (self.norm(), theta, self.klein().unwrap()))
     }
-    /// Convert from hyperbolic polar form (rho, theta) such that ˋSelfˋ = rho (cosh(theta) + h sinh(theta)). Formula is taken from Table 4.1 in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6). The resulting ˋSelfˋ is in the right sector of the hyperbolic plane.
+    /// Convert from hyperbolic polar form (rho, theta, klein) such that ˋSelfˋ = rho (cosh(theta) + h sinh(theta)). Formula is taken from Tab. 1 and Appendix B in [Hyperbolic trigonometry in two-dimensional space-time geometry](https://doi.org/10.1393/ncb/i2003-10012-9). The resulting ˋSelfˋ is in the right sector of the hyperbolic plane.
     #[inline]
     pub fn from_polar(rho: T, theta: T, klein: Self) -> Self {
         klein * Self::new(rho * theta.cosh(), rho * theta.sinh())
     }
 
-    /// Computes the hyperbolic exponential function. Formula is taken from Sec 4.1.1 Hyperbolic Exponential Function and 7.4 The Elementary Functions of a Canonical Hyperbolic Variable in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
+    /// Computes the hyperbolic exponential function for all sectors. Formula is extended to all sectors, see Sec 4.1.1 Hyperbolic Exponential Function and 7.4 The Elementary Functions of a Canonical Hyperbolic Variable in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
     #[inline]
     pub fn exp(self) -> Self {
-        /* if t.abs() > x.abs() { // TODO ?
-            // self.is_time_like()
-            let t_exp = t.signum() * t.exp();
-            Self::new(t_exp * t.cosh(), t_exp * x.sinh())
-        } else {
-            let t_exp = x.signum() * t.exp();
-            Self::new(t_exp * t.sinh(), t_exp * x.cosh())
-        } */
-        let Self { t, x } = self;
-        let signum = if t.abs() > x.abs() {
-            // self.is_time_like()
-            t.signum()
-        } else {
-            x.signum()
-        };
-        let t_exp = signum * t.exp();
-        Self::new(t_exp * x.cosh(), t_exp * x.sinh())
+        let k = self.klein().unwrap_or(Perplex::one());
+        let Self { t, x } = k * self;
+        let t_exp = t.exp();
+        k * Self::new(t_exp * x.cosh(), t_exp * x.sinh())
     }
-    /// Computes the inverse of the hyperbolic exponential function, i.e., the natural logarithm. Formula is taken from Sec. 7.4 The Elementary Functions of a Canonical Hyperbolic Variable in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
+    /// Computes the inverse of the hyperbolic exponential function, i.e., the natural logarithm. Formula is extended to all sectors, see Sec. 7.4 The Elementary Functions of a Canonical Hyperbolic Variable in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
     #[inline]
     pub fn ln(self) -> Option<Self> {
-        let Self { t, x } = self;
-        let squared_distance = t * t - x * x;
-        let two = T::one() + T::one();
-        if squared_distance == T::zero() {
-            // light-like
-            None
-        } else if squared_distance > T::zero() {
-            // self.is_time_like()
+        self.klein().map(|k| {
+            let Self { t, x } = k * self;
+            let squared_distance = t * t - x * x;
+            let two = T::one() + T::one();
             let t_new = squared_distance.ln() / two;
             let x_new = (x / t).atanh();
-            Some(Self::new(t_new, x_new))
-        } else {
-            // self.is_space_like()
-            let t_new = squared_distance.neg().ln() / two;
-            let x_new = (t / x).atanh();
-            Some(Self::new(t_new, x_new))
-        }
+            k * Self::new(t_new, x_new)
+        })
     }
 
     // TODO sqrt, cbrt, powf, log, powc, expf not existent for Perplex ?

@@ -31,6 +31,8 @@ A categorization of perplex numbers based on the squared distance is crucial for
 
 The inversion of a perplex number, for instance, is only defined for time- or space-like numbers [Fundamental Theorems of Algebra for the Perplexes](https://doi.org/10.4169/074683409X475643).
 
+**TODO** explain klein group and how it provides extension of exp / ln to all sectors - Tab. 1 and Appendix B in [Hyperbolic trigonometry in two-dimensional space-time geometry](https://doi.org/10.1393/ncb/i2003-10012-9)
+
 ### Matrix Representation
 
 

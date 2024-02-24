@@ -20,6 +20,9 @@ mod tests {
         let z = Perplex::new(-1.0, 2.0);
         assert!(z.is_space_like());
         assert_eq!(z.norm(), f64::sqrt(3.0), "-1 + 2h has a norm of √3");
+        assert_eq!(z.l1_norm(), 3.0, "-1 + 2h has a l1 norm of 3");
+        assert_eq!(z.l2_norm(), f64::sqrt(5.0), "-1 + 2h has a l2 norm of √5");
+        assert_eq!(z.max_norm(), 2.0, "-1 + 2h has a max norm of 2");
     }
     #[test]
     fn test_inv() {
@@ -135,9 +138,9 @@ mod tests {
     #[test]
     fn test_exponential_logarithm() {
         let z = Perplex::new(2.0, 1.0); // Right-Sector
-        assert_abs_diff_eq!(z.exp().ln().unwrap(), z);
+        assert_abs_diff_eq!(z.exp().ln().unwrap(), z, epsilon = 0.00001);
         let z = Perplex::new(-2.0, 1.0); // Left-Sector
-        assert_abs_diff_eq!(z.exp().ln().unwrap(), z);
+        assert_abs_diff_eq!(z.exp().ln().unwrap(), z, epsilon = 0.00001);
         let z = Perplex::new(1.0, 2.0); // Up-Sector
         assert_abs_diff_eq!(z.exp().ln().unwrap(), z, epsilon = 0.00001);
         let z = Perplex::new(1.0, -2.0); // Down-Sector
