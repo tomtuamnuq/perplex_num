@@ -137,64 +137,6 @@ impl<T: Copy + Float> Perplex<T> {
         self.modulus()
     }
 
-    /// Create a new Perplex with a given phase theta: `exp(h theta)`.
-    #[inline]
-    pub fn cis(theta: T) -> Self {
-        Self::new(theta.cosh(), theta.sinh())
-    }
-
-    /// Calculate the argument of ˋselfˋ, if it exists. Formula is taken from Eq. 4.1.6 in Sec 4.1.1 Hyperbolic Exponential Function and Hyperbolic Polar Transformation in The Mathematics of Minkowski Space-Time.
-    #[inline]
-    pub fn arg(self) -> Option<T> {
-        let Self { t, x } = self;
-        let (t_abs, x_abs) = (t.abs(), x.abs());
-        if t_abs == x_abs {
-            // light-like
-            None
-        } else if t_abs > x_abs {
-            Some((x / t).atanh())
-        } else {
-            Some((t / x).atanh())
-        }
-    }
-
-    /// Calculate the klein index of ˋselfˋ for space- or time-like numbers. Formula is taken from Tab. 1 and Appendix B in [Hyperbolic trigonometry in two-dimensional space-time geometry](https://doi.org/10.1393/ncb/i2003-10012-9).
-    #[inline]
-    pub fn klein(self) -> Option<Self> {
-        let Self { t, x } = self;
-        let (t_abs, x_abs) = (t.abs(), x.abs());
-        if t_abs == x_abs {
-            // light-like
-            None
-        } else if t_abs > x_abs {
-            if t > T::zero() {
-                // Right-Sector
-                Some(Self::one())
-            } else {
-                // Left-Sector
-                Some(-Self::one())
-            }
-        } else if x > T::zero() {
-            // Up-Sector
-            Some(Self::h())
-        } else {
-            // Down-Sector
-            Some(-Self::h())
-        }
-    }
-
-    /// Convert to hyperbolic polar form (rho, theta, klein) such that ˋselfˋ = klein rho (cosh(theta) + h sinh(theta)), if theta (ˋself.arg()ˋ) exists.
-    #[inline]
-    pub fn to_polar(self) -> Option<(T, T, Self)> {
-        self.arg()
-            .map(|theta| (self.norm(), theta, self.klein().unwrap()))
-    }
-    /// Convert from hyperbolic polar form (rho, theta, klein) such that ˋSelfˋ = rho (cosh(theta) + h sinh(theta)). Formula is taken from Tab. 1 and Appendix B in [Hyperbolic trigonometry in two-dimensional space-time geometry](https://doi.org/10.1393/ncb/i2003-10012-9). The resulting ˋSelfˋ is in the right sector of the hyperbolic plane.
-    #[inline]
-    pub fn from_polar(rho: T, theta: T, klein: Self) -> Self {
-        klein * Self::new(rho * theta.cosh(), rho * theta.sinh())
-    }
-
     /// Computes the hyperbolic exponential function for all sectors. Formula is extended to all sectors, see Sec 4.1.1 Hyperbolic Exponential Function and 7.4 The Elementary Functions of a Canonical Hyperbolic Variable in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
     #[inline]
     pub fn exp(self) -> Self {
