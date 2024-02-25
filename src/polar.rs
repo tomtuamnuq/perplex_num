@@ -1,6 +1,7 @@
 use super::Perplex;
-use num_traits::{Float, One};
+use num_traits::{Float, Num, One, Pow};
 
+// TODO docs and explain Diagonal - which line is used is encoded in theta
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
 pub enum HyperbolicSector<T> {
     #[default]
@@ -12,6 +13,7 @@ pub enum HyperbolicSector<T> {
 }
 
 impl<T: Copy + Float> From<Perplex<T>> for HyperbolicSector<T> {
+    #[inline]
     fn from(z: Perplex<T>) -> Self {
         let Perplex { t, x } = z;
         let (t_abs, x_abs) = (t.abs(), x.abs());
@@ -35,11 +37,22 @@ impl<T: Copy + Float> From<Perplex<T>> for HyperbolicSector<T> {
 /// Convert to hyperbolic polar form (rho, theta, klein) such that ˋselfˋ = klein rho (cosh(theta) + h sinh(theta)).
 /// Convert from hyperbolic polar form (rho, theta, klein) such that ˋSelfˋ = rho (cosh(theta) + h sinh(theta)). Formula is taken from Tab. 1 and Appendix B in [Hyperbolic trigonometry in two-dimensional space-time geometry](https://doi.org/10.1393/ncb/i2003-10012-9). The resulting ˋSelfˋ is in the right sector of the hyperbolic plane.
 // TODO describe light-like case
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct HyperbolicPolar<T> {
     pub rho: T,
     pub theta: T,
     pub sector: HyperbolicSector<T>,
+}
+
+impl<T: Copy + Num> Default for HyperbolicPolar<T> {
+    #[inline]
+    fn default() -> Self {
+        Self {
+            rho: T::one(),
+            theta: T::zero(),
+            sector: HyperbolicSector::Right,
+        }
+    }
 }
 
 impl<T: Copy + Float> From<Perplex<T>> for HyperbolicPolar<T> {
@@ -125,6 +138,42 @@ impl<T: Copy + Float> Perplex<T> {
         } else {
             // Down-Sector
             Some(-Self::h())
+        }
+    }
+}
+
+// TODO implement powu and powi based on the polar form if nalgebra feature is not activated - conversion only if n > 50 ?
+// Extended version of Formula 4.6 in [New characterizations of the ring of the split-complex numbers and the field C of complex numbers and their comparative analyses](https://doi.org/10.48550/arXiv.2305.04586)
+impl<T: Copy + Float> Pow<u32> for HyperbolicPolar<T> {
+    type Output = Self;
+    #[inline]
+    fn pow(self, exp: u32) -> Self::Output {
+        match exp {
+            0 => Self::default(),
+            1 => self,
+            n => {
+                let n = n as i32;
+                let Self { rho, theta, sector } = self;
+                if let HyperbolicSector::Diagonal(t) = sector {
+                    let t_new = t * (t + t).powi(n - 1); // t^n * 2^{n-1}
+                    HyperbolicPolar {
+                        rho,
+                        theta,
+                        sector: HyperbolicSector::Diagonal(t_new),
+                    }
+                } else {
+                    let new_sector = if n % 2 == 0 {
+                        HyperbolicSector::Right // since -1^2 = 1 and h^2=1
+                    } else {
+                        sector
+                    };
+                    HyperbolicPolar {
+                        rho: rho.powi(n), // Formula 4.6
+                        theta: T::from(n).unwrap() * theta,
+                        sector: new_sector,
+                    }
+                }
+            }
         }
     }
 }

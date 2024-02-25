@@ -7,7 +7,7 @@ use num_traits::{Float, Inv, MulAdd, MulAddAssign, Num, NumAssign, One, Zero};
 // The Mathematics of Minkowski Space-Time
 // 4.1 Geometrical Representation of Hyperbolic Numbers
 
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct Perplex<T> {
     /// first coordinate t for time as real part
     pub t: T,
@@ -40,6 +40,12 @@ where
     }
 }
 
+impl<T: Copy + Num> Default for Perplex<T> {
+    #[inline]
+    fn default() -> Self {
+        Self::new(T::one(), T::zero())
+    }
+}
 impl<T: Copy + Num> Perplex<T> {
     /// Returns hyperbolic unit.
     #[inline]
