@@ -1,10 +1,13 @@
 # perplex_num
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE-MIT) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE-APACHE) [![minimum rustc 1.76](https://img.shields.io/badge/rustc-1.76+-red.svg)](https://rust-lang.github.io/rfcs/2495-min-rust-version.html)
+
+
 ## Overview
-`perplex_num` is a Rust crate that provides an implementation of perplex numbers, based on the [nalgebra](https://docs.rs/nalgebra/latest/nalgebra/) crate. This library allows for the representation and manipulation of perplex numbers, offering both a struct-based approach and a matrix form representation.
+`perplex_num` is a Rust crate that provides an implementation of perplex numbers, based on the [num_traits](https://docs.rs/num-traits) crate. This library allows for the representation and manipulation of perplex numbers, offering both a struct-based approach and a matrix form representation feature based on [nalgebra](https://docs.rs/nalgebra).
 
 ## Perplex Numbers
 Perplex numbers, also known as **split-complex**, **double** or **hyperbolic** numbers, are an extension of the real numbers $\mathbb R$ by introducing a new element $h$ with the property that $h^2=1$, which is distinct from the imaginary unit $i$ in complex numbers ($i^2=-1$). $h$ is referred to as **hyperbolic unit**. A perplex number $z$ is expressed as:
-$$z=t + x h \quad t,x \in \mathbb R \quad h^2=1$$
+$$z=t + x h \quad t,x \in \mathbb R \quad h^2=1 \quad h\not=\pm 1$$
 The perplex numbers have applications in various fields for instance special relativity. In the context of Minkowski space, which is used in special relativity, the variables $t$ and $x$ typically represent **time** (the real part of $z$) and **space** (a spatial coordinate - the hyperbolic part of $z$). A thorough description of hyperbolic numbers in this regard can be found in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6). They form a two-dimensional commutative algebra over the real numbers, similar to the complex plane, but with a different geometric interpretation due to the hyperbolic unit: 
 
 **TODO** add an image of perplex number plane made with Plotters
@@ -29,17 +32,17 @@ A categorization of perplex numbers based on the squared distance is crucial for
 - **space**-like if D(z) < 0
 - **light**-like if D(z) = 0
 
-The inversion of a perplex number, for instance, is only defined for time- or space-like numbers [Fundamental Theorems of Algebra for the Perplexes](https://doi.org/10.4169/074683409X475643).
+The inversion of a perplex number, for instance, is only defined for time- or space-like numbers, more info at [Fundamental Theorems of Algebra for the Perplexes](https://doi.org/10.4169/074683409X475643).
 
 **TODO** explain klein group and how it provides extension of exp / ln to all sectors - Tab. 1 and Appendix B in [Hyperbolic trigonometry in two-dimensional space-time geometry](https://doi.org/10.1393/ncb/i2003-10012-9)
 
-### Matrix Representation
-
+### Polar and Matrix Representation
+**TODO** explain the forms and operations as well as more performant power operation based on these (benches)
 
 ## Features
 - `Perplex` struct implements all common mathematical operations via `std::ops` traits
-- ˋPerplexˋ implements most of the functions that ˋnalgebra::Complexˋ type has (with the same naming conventions)
--  
+- `Perplex` implements most of the functions that`nalgebra::Complex` has (with the same naming conventions, see crate [num-complex](https://github.com/rust-num/num-complex))
+- **Matrix** reprentation feature based on [nalgebra::Matrix](https://docs.rs/nalgebra/latest/nalgebra/base/struct.Matrix.html)
 
 ## Usage
 
@@ -50,6 +53,16 @@ The inversion of a perplex number, for instance, is only defined for time- or sp
 [dependencies]
 perplex_num = "0.1"
 ```
+
+The `matrix` feature is enabled by default, which adds the `nalgebra` create as a dependency. This can be disabled with:
+```toml
+[dependencies.perplex_num]
+perplex_num = "0.1"
+default-features = false
+```
+
+## Compatibility
+The `perplex_num` crate is tested for rustc 1.76.
 
 ## Bibliography
 - [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6)

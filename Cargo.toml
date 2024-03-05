@@ -1,15 +1,29 @@
 [package]
+authors = ["Tom Krüger"]
+description = "Perplex numbers based on num-traits"
+documentation = "https://github.com/tomtuamnuq/perplex_num"
+homepage = "https://github.com/tomtuamnuq/perplex_num"
+keywords = ["mathematics", "numerics", "hyperbolic"]
+categories = ["algorithms", "science"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/tomtuamnuq/perplex_num"
 name = "perplex_num"
 version = "0.1.0"
+readme = "README.md"
 edition = "2021"
+rust-version = "1.76"
 
 [dependencies]
 approx = "0.5.1"
-nalgebra = "0.32.3"
-num-traits = "0.2.18"
+num-traits = "0.2.18" 
+nalgebra = { version = "0.32.4", optional = true }
 
 [dev-dependencies]
-criterion = "0.5"
+criterion = "0.5.1"
+
+[features]
+default = ["matrix"]
+matrix = ["dep:nalgebra"]
 
 [[bench]]
 name = "multiplication"
