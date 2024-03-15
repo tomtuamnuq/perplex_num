@@ -142,7 +142,6 @@ impl<T: Copy + Float> Perplex<T> {
     }
 }
 
-// TODO implement powu and powi based on the polar form if nalgebra feature is not activated - conversion only if n > 50 ?
 // Extended version of Formula 4.6 in [New characterizations of the ring of the split-complex numbers and the field C of complex numbers and their comparative analyses](https://doi.org/10.48550/arXiv.2305.04586)
 impl<T: Copy + Float> Pow<u32> for HyperbolicPolar<T> {
     type Output = Self;

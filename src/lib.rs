@@ -360,6 +360,14 @@ mod tests {
             Perplex::new(4.0, -4.0),
             "Power 3 multiplication result!"
         );
+        let z = Perplex::new(f64::PI(), -0.123);
+        assert_eq!(z.powu(3), z * z * z, "Power 3 multiplication result!");
+        assert_abs_diff_eq!(
+            z.powu(8),
+            z * z * z * z * z * z * z * z,
+            epsilon = 0.0000001
+        );
+        assert_abs_diff_eq!(z.powu(7), z * z * z * z * z * z * z, epsilon = 0.0000001);
     }
     #[test]
     fn test_power_i32() {
@@ -381,6 +389,21 @@ mod tests {
             z.powi(-3).unwrap(),
             Perplex::new(14.0 / 27.0, -13.0 / 27.0),
             "Power -3 multiplication result!"
+        );
+        let z = Perplex::new(f64::PI(), -0.123);
+        let z_inv = z.try_inverse().unwrap();
+        assert_eq!(
+            z.powi(-3).unwrap(),
+            z_inv * z_inv * z_inv,
+            "Power -3 multiplication result!"
+        );
+        assert_abs_diff_eq!(
+            z.powi(-8).unwrap(),
+            z_inv * z_inv * z_inv * z_inv * z_inv * z_inv * z_inv * z_inv,
+        );
+        assert_abs_diff_eq!(
+            z.powi(-7).unwrap(),
+            z_inv * z_inv * z_inv * z_inv * z_inv * z_inv * z_inv,
         );
     }
 }

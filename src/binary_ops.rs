@@ -1,6 +1,6 @@
 use super::Perplex;
-use num_traits::{Num, NumAssign};
-use std::ops::{Add, Div, Mul, Sub};
+use num_traits::{Inv, Num, NumAssign, One, Pow};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 
 // Properties of the Perplex Numbers in Fundamental Theorems of Algebra for the Perplexes:
@@ -142,5 +142,52 @@ impl<T: Copy + NumAssign> DivAssign<T> for Perplex<T> {
     fn div_assign(&mut self, rhs: T) {
         self.t /= rhs;
         self.x /= rhs;
+    }
+}
+
+impl<T: Copy + Num + Neg<Output = T>> Perplex<T> {
+    /// Raises ˋselfˋ to an unsigned integer power.
+    #[inline]
+    pub fn powu(&self, exp: u32) -> Self {
+        Pow::pow(*self, exp)
+    }
+
+    /// Raises ˋselfˋ to a signed integer power.
+    #[inline]
+    pub fn powi(&self, exp: i32) -> Option<Self> {
+        Pow::pow(*self, exp)
+    }
+}
+
+impl<T: Copy + Num> Pow<u32> for Perplex<T> {
+    type Output = Perplex<T>;
+    #[inline]
+    fn pow(self, mut exp: u32) -> Self::Output {
+        // iterative version of https://wikipedia.org/wiki/Exponentiation_by_squaring
+        let mut result = Perplex::one();
+        if exp == 0 {
+            return result;
+        }
+        let mut base = self;
+        while exp > 1 {
+            if exp % 2 == 1 {
+                result = result * base;
+            }
+            exp /= 2;
+            base = base * base;
+        }
+        result * base
+    }
+}
+
+impl<T: Copy + Num + Neg<Output = T>> Pow<i32> for Perplex<T> {
+    type Output = Option<Perplex<T>>;
+    #[inline]
+    fn pow(self, exp: i32) -> Self::Output {
+        if exp < 0 {
+            self.inv().map(|z| z.pow(exp.wrapping_neg() as u32))
+        } else {
+            Some(Pow::pow(self, exp as u32))
+        }
     }
 }

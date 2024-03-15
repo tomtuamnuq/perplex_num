@@ -22,7 +22,7 @@ Let $z=t+xh$ be a perplex number:
 - **Conjugate** of a perplex number is: $$\bar z = t - xh$$
 - **Squared Distance** is defined by the quadratic form $D$, and can be negative: $$D(z)=z\bar z = t^2-x^2$$
 - **Modulus (magnitude)** is the square root of the absolute value of $D(z)\in \mathbb R $: $$\vert z \vert = \sqrt{\vert D(z) \vert}$$
-- **Inverse** $z^{-1}=\frac{1}{z}$ is the perplex number that multiplies to the neutral element of multiplication ($zz^{-1}=1$). It is given by: $$ z^{-1} =  \frac{\bar z}{D(z)} = \frac{t - xh}{t^2-x^2}$$
+- **Inverse** $z^{-1}=\frac{1}{z}$ is the perplex number that multiplies to the neutral element of multiplication ($zz^{-1}=1$). It is given by: $$z^{-1}=\frac{\bar z}{D(z)}=\frac{t - xh}{t^2-x^2}$$
 
 Perplex numbers include elements called null vectors or **zero divisors**, which are of the form $x+xh$ or $x-xh$, with $x\not=0$. These are exactly the non-zero elements with a modulus of zero. These numbers are not invertible, meaning they do not have a multiplicative inverse within the set of perplex numbers.
 
@@ -41,7 +41,7 @@ The inversion of a perplex number, for instance, is only defined for time- or sp
 
 ## Features
 - `Perplex` struct implements all common mathematical operations via `std::ops` traits
-- `Perplex` implements most of the functions that`nalgebra::Complex` has (with the same naming conventions, see crate [num-complex](https://github.com/rust-num/num-complex))
+- `Perplex` implements most of the functions that`nalgebra::Complex` has (with the same naming conventions, see crate [num_complex](https://github.com/rust-num/num-complex))
 - **Matrix** reprentation feature based on [nalgebra::Matrix](https://docs.rs/nalgebra/latest/nalgebra/base/struct.Matrix.html)
 
 ## Usage
