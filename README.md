@@ -10,7 +10,9 @@ Perplex numbers, also known as **split-complex**, **double** or **hyperbolic** n
 $$z=t + x h \quad t,x \in \mathbb R \quad h^2=1 \quad h\not=\pm 1$$
 The perplex numbers have applications in various fields for instance special relativity. In the context of Minkowski space, which is used in special relativity, the variables $t$ and $x$ typically represent **time** (the real part of $z$) and **space** (a spatial coordinate - the hyperbolic part of $z$). A thorough description of hyperbolic numbers in this regard can be found in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6). They form a two-dimensional commutative algebra over the real numbers, similar to the complex plane, but with a different geometric interpretation due to the hyperbolic unit: 
 
-**TODO** add an image of perplex number plane made with Plotters
+![Perplex Numbers Example image](./examples/perplex_numbers.jpg)
+
+**TODO** add sqrt, diagonal (for D(z)=0), hyperbola, sectors
 
 ### Operations
 The perplex numbers form an algebraic ring with addition and multiplication (see [Wikipedia](https://wikipedia.org/wiki/Split-complex_number) for a definition in terms of abstract algebra). Let $z_1=t_1+x_1h$ and $z_2=t_2+x_2h$ be two perplex numbers:
@@ -54,7 +56,7 @@ The inversion of a perplex number, for instance, is only defined for time- or sp
 perplex_num = "0.1"
 ```
 
-The `matrix` feature is enabled by default, which adds the `nalgebra` create as a dependency. This can be disabled with:
+The `matrix` feature is enabled by default, which adds the `nalgebra` crate as a dependency. This can be disabled with:
 ```toml
 [dependencies.perplex_num]
 perplex_num = "0.1"
