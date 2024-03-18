@@ -146,13 +146,13 @@ impl<T: Copy + NumAssign> DivAssign<T> for Perplex<T> {
 }
 
 impl<T: Copy + Num + Neg<Output = T>> Perplex<T> {
-    /// Raises ˋselfˋ to an unsigned integer power.
+    /// Raises `self` to an unsigned integer power.
     #[inline]
     pub fn powu(&self, exp: u32) -> Self {
         Pow::pow(*self, exp)
     }
 
-    /// Raises ˋselfˋ to a signed integer power.
+    /// Raises `self` to a signed integer power.
     #[inline]
     pub fn powi(&self, exp: i32) -> Option<Self> {
         Pow::pow(*self, exp)

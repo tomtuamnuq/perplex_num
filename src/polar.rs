@@ -34,8 +34,8 @@ impl<T: Copy + Float> From<Perplex<T>> for HyperbolicSector<T> {
     }
 }
 
-/// Convert to hyperbolic polar form (rho, theta, klein) such that ˋselfˋ = klein rho (cosh(theta) + h sinh(theta)).
-/// Convert from hyperbolic polar form (rho, theta, klein) such that ˋSelfˋ = rho (cosh(theta) + h sinh(theta)). Formula is taken from Tab. 1 and Appendix B in [Hyperbolic trigonometry in two-dimensional space-time geometry](https://doi.org/10.1393/ncb/i2003-10012-9). The resulting ˋSelfˋ is in the right sector of the hyperbolic plane.
+/// Convert to hyperbolic polar form (rho, theta, klein) such that `self` = klein rho (cosh(theta) + h sinh(theta)).
+/// Convert from hyperbolic polar form (rho, theta, klein) such that `Self` = rho (cosh(theta) + h sinh(theta)). Formula is taken from Tab. 1 and Appendix B in [Hyperbolic trigonometry in two-dimensional space-time geometry](https://doi.org/10.1393/ncb/i2003-10012-9). The resulting `Self` is in the right sector of the hyperbolic plane.
 // TODO describe light-like case
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct HyperbolicPolar<T> {
@@ -94,7 +94,7 @@ impl<T: Copy + Float> Perplex<T> {
         Self::new(theta.cosh(), theta.sinh())
     }
 
-    /// Calculate the hyperbolic argument of ˋselfˋ. Formula is taken from Eq. 4.1.6 in Sec 4.1.1 Hyperbolic Exponential Function and Hyperbolic Polar Transformation in The Mathematics of Minkowski Space-Time.
+    /// Calculate the hyperbolic argument of `self`. Formula is taken from Eq. 4.1.6 in Sec 4.1.1 Hyperbolic Exponential Function and Hyperbolic Polar Transformation in The Mathematics of Minkowski Space-Time.
     /// Lines x=t and x=-t are mapped to ∞ and -∞, according to Sec. 4.1 in [New characterizations of the ring of the split-complex numbers and the field C of complex numbers and their comparative analyses](https://doi.org/10.48550/arXiv.2305.04586).
     #[inline]
     pub fn arg(self) -> T {
@@ -116,7 +116,7 @@ impl<T: Copy + Float> Perplex<T> {
         }
     }
 
-    /// Calculate the klein index of ˋselfˋ for space- or time-like numbers. Formula is taken from Tab. 1 and Appendix B in [Hyperbolic trigonometry in two-dimensional space-time geometry](https://doi.org/10.1393/ncb/i2003-10012-9).
+    /// Calculate the klein index of `self` for space- or time-like numbers. Formula is taken from Tab. 1 and Appendix B in [Hyperbolic trigonometry in two-dimensional space-time geometry](https://doi.org/10.1393/ncb/i2003-10012-9).
     #[inline]
     pub fn klein(self) -> Option<Self> {
         let Self { t, x } = self;

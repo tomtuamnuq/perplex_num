@@ -65,7 +65,7 @@ impl<T: Copy + Num> Perplex<T> {
     pub fn squared_distance(&self) -> T {
         self.t * self.t - self.x * self.x
     }
-    /// Multiplies ˋselfˋ by the scalar ˋfactorˋ.
+    /// Multiplies `self` by the scalar `factor`.
     #[inline]
     pub fn scale(&self, factor: T) -> Self {
         Self::new(factor * self.t, factor * self.x)
@@ -94,7 +94,7 @@ impl<T: Copy + Num + Neg<Output = T>> Perplex<T> {
     pub fn conj(&self) -> Self {
         Self::new(self.t, -self.x)
     }
-    /// Returns the multiplicative inverse ˋ1/selfˋ, if it exists, or an error if not.
+    /// Returns the multiplicative inverse `1/self`, if it exists, or an error if not.
     #[inline]
     pub fn try_inverse(&self) -> Option<Self> {
         let squared_distance = self.squared_distance();
@@ -126,18 +126,18 @@ impl<T: Copy + Float> Perplex<T> {
         self.t.abs().max(self.x.abs())
     }
 
-    /// Returns the modulus of ˋselfˋ.
+    /// Returns the modulus of `self`.
     #[inline]
     pub fn modulus(self) -> T {
         let d_z = self.squared_distance();
         d_z.abs().sqrt()
     }
-    /// Returns the norm (modulus) of ˋselfˋ.
+    /// Returns the norm (modulus) of `self`.
     #[inline]
     pub fn norm(self) -> T {
         self.modulus()
     }
-    /// Returns the magnitude (modulus) of ˋselfˋ.
+    /// Returns the magnitude (modulus) of `self`.
     #[inline]
     pub fn magnitude(self) -> T {
         self.modulus()
@@ -166,22 +166,22 @@ impl<T: Copy + Float> Perplex<T> {
 
     // TODO sqrt, cbrt, powf, log, powc, expf not existent for Perplex ?
 
-    /// Computes the sinus (circular trigonometric) of ˋselfˋ. Formula is taken from Eq. 7.4.6 in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
+    /// Computes the sinus (circular trigonometric) of `self`. Formula is taken from Eq. 7.4.6 in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
     #[inline]
     pub fn sin(self) -> Self {
         Self::new(self.t.sin() * self.x.cos(), self.t.cos() * self.x.sin())
     }
-    /// Computes the cosinus (circular trigonometric) of ˋselfˋ. Formula is taken from Eq. 7.4.6 in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
+    /// Computes the cosinus (circular trigonometric) of `self`. Formula is taken from Eq. 7.4.6 in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
     #[inline]
     pub fn cos(self) -> Self {
         Self::new(self.t.cos() * self.x.cos(), self.t.sin() * self.x.sin())
     }
-    /// Computes the sinh (hyperbolic trigonometric) of ˋselfˋ. Formula is taken from Eq. 7.4.5 in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
+    /// Computes the sinh (hyperbolic trigonometric) of `self`. Formula is taken from Eq. 7.4.5 in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
     #[inline]
     pub fn sinh(self) -> Self {
         Self::new(self.t.sinh() * self.x.cosh(), self.t.cosh() * self.x.sinh())
     }
-    /// Computes the cosh (hyperbolic trigonometric) of ˋselfˋ. Formula is taken from Eq. 7.4.5 in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
+    /// Computes the cosh (hyperbolic trigonometric) of `self`. Formula is taken from Eq. 7.4.5 in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
     #[inline]
     pub fn cosh(self) -> Self {
         Self::new(self.t.cosh() * self.x.cosh(), self.t.sinh() * self.x.sinh())
