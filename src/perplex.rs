@@ -1,17 +1,27 @@
+//! # Perplex Module
+//! This module defines the `Perplex` struct and provides common mathematical methods for it.
+//!
+//! ## Features
+//! - Calculation of common distance metrics as well as the squared distance in the hyperbolic plane.
+//! - Determination of the number's nature (time-like, space-like, or light-like) based on its squared distance. See Properties of the Perplex Numbers in [Fundamental Theorems of Algebra for the Perplexes](https://doi.org/10.4169/074683409X475643).
+//! - `AbsDiffEq` trait from the `approx` crate.
+//! - Tertiary operations, constants and `FloatCore` traits from the `num_traits` crate.
+//! - Hyperbolic exponential function as well as the natural logarithm as the inversion.
+//! - Common trigonometric functions in the hyperbolic plane.
+
 use std::ops::Neg;
 
 use approx::AbsDiffEq;
 use num_traits::float::FloatCore;
 use num_traits::{Float, MulAdd, MulAddAssign, Num, NumAssign, One, Zero};
 
-// The Mathematics of Minkowski Space-Time
-// 4.1 Geometrical Representation of Hyperbolic Numbers
-
+/// The `Perplex` struct is a representation of hyperbolic numbers, also known as split-complex numbers, which consist of two components: a real part (t) and a hyperbolic part (x). These components correspond to the time and space coordinates in Minkowski space-time, respectively. See Sec. 4.1 `Geometrical Representation of Hyperbolic Numbers` in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
+/// The implementation is generic over a type `T`, which allows it to be used with different numeric types (i.e., `f32` or `f64`).
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct Perplex<T> {
-    /// first coordinate t for time as real part
+    /// The real part of the perplex number, representing time.
     pub t: T,
-    /// second coordinate x for space as hyperbolic part
+    /// The hyperbolic part of the perplex number, representing space.
     pub x: T,
 }
 
@@ -41,21 +51,25 @@ where
 }
 
 impl<T: Copy + Num> Default for Perplex<T> {
+    /// Defaults to the neutral element of multiplication.
     #[inline]
     fn default() -> Self {
         Self::new(T::one(), T::zero())
     }
 }
+
 impl<T: Copy + Num> Perplex<T> {
     /// Returns hyperbolic unit.
     #[inline]
     pub fn h() -> Self {
         Self::new(T::zero(), T::one())
     }
+    /// Returns the time component.
     #[inline]
     pub fn real(&self) -> T {
         self.t
     }
+    /// Returns the space component.
     #[inline]
     pub fn hyperbolic(&self) -> T {
         self.x
@@ -72,17 +86,17 @@ impl<T: Copy + Num> Perplex<T> {
     }
 }
 impl<T: Copy + Num + PartialOrd> Perplex<T> {
-    /// Checks if the perplex number is time-like, i.e., the squared distance is positive. See Properties of the Perplex Numbers in [Fundamental Theorems of Algebra for the Perplexes](https://doi.org/10.4169/074683409X475643)
+    /// Checks if the perplex number is time-like, i.e., the squared distance is positive.
     #[inline]
     pub fn is_time_like(&self) -> bool {
         self.squared_distance() > T::zero()
     }
-    /// Checks if the perplex number is space-like, i.e., the squared distance is negative. See Properties of the Perplex Numbers in [Fundamental Theorems of Algebra for the Perplexes](https://doi.org/10.4169/074683409X475643)
+    /// Checks if the perplex number is space-like, i.e., the squared distance is negative.
     #[inline]
     pub fn is_space_like(&self) -> bool {
         self.squared_distance() < T::zero()
     }
-    /// Checks if the perplex number is light-like, i.e., the squared distance is zero. See Properties of the Perplex Numbers in [Fundamental Theorems of Algebra for the Perplexes](https://doi.org/10.4169/074683409X475643)
+    /// Checks if the perplex number is light-like, i.e., the squared distance is zero.
     #[inline]
     pub fn is_light_like(&self) -> bool {
         self.squared_distance() == T::zero()
@@ -94,7 +108,7 @@ impl<T: Copy + Num + Neg<Output = T>> Perplex<T> {
     pub fn conj(&self) -> Self {
         Self::new(self.t, -self.x)
     }
-    /// Returns the multiplicative inverse `1/self`, if it exists, or None if not.
+    /// Returns the multiplicative inverse `1/self`, if it exists, or `None` if not.
     #[inline]
     pub fn try_inverse(&self) -> Option<Self> {
         let squared_distance = self.squared_distance();
@@ -164,7 +178,8 @@ impl<T: Copy + Float> Perplex<T> {
         })
     }
 
-    // TODO sqrt, cbrt, powf, log, powc, expf not existent for Perplex ?
+    // TODO sqrt, log
+    // TODO cbrt, powf, powc, expf for Perplex ?
 
     /// Computes the sinus (circular trigonometric) of `self`. Formula is taken from Eq. 7.4.6 in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
     #[inline]

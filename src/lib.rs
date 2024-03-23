@@ -1,15 +1,15 @@
 mod binary_ops;
+#[cfg(feature = "matrix")]
+mod matrix;
 mod perplex;
 mod polar;
-#[cfg(feature = "matrix")]
-mod repr_as_matrix;
 mod single_ops;
 
 pub use perplex::Perplex;
 pub use polar::{HyperbolicPolar, HyperbolicSector};
 
 #[cfg(feature = "matrix")]
-pub use repr_as_matrix::PerplexMatrixForm;
+pub use matrix::PerplexMatrixForm;
 
 #[cfg(test)]
 mod tests {
