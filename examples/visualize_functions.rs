@@ -5,6 +5,7 @@ use plotters::{
     prelude::*,
     style::full_palette::{LIGHTBLUE, LIGHTGREEN, PURPLE},
 };
+type PerplexMap = Box<dyn Fn(&Perplex<f64>) -> Perplex<f64>>;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let root =
@@ -45,7 +46,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             hyperbola_rd.push(Perplex::new(t, -x));
         });
 
-    let functions: Vec<(&str, Box<dyn Fn(&Perplex<f64>) -> Perplex<f64>>, &RGBColor)> = vec![
+    let functions: Vec<(&str, PerplexMap, &RGBColor)> = vec![
         (
             "inv",
             Box::new(|z: &Perplex<f64>| z.try_inverse().expect("z is invertible")),

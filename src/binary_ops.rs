@@ -1,9 +1,28 @@
+//! # Binary Operations Module
+//!
+//! This module is dedicated to implementing traits from both the standard library and the `num_traits` crate for the `Perplex` struct. It provides the foundational binary operations necessary for working with two perplex numbers. See `Properties of the Perplex Numbers` in [Fundamental Theorems of Algebra for the Perplexes](https://doi.org/10.4169/074683409X475643)
+//!
+//! ## Traits from `std::ops`
+//! The module includes implementations for basic arithmetic operations between `Perplex` structs, such as:
+//! - `Add`: Trait for the addition operator.
+//! - `Sub`: Trait for the subtraction operator.
+//! - `Mul`: Trait for the multiplication operator.
+//! - `Div`: Trait for the division operator.
+//!
+//! Additionally, it supports assignment variants of these operations for mutable references of `Perplex` structs, which are:
+//! - `AddAssign`: Trait for addition assignment.
+//! - `SubAssign`: Trait for subtraction assignment.
+//! - `MulAssign`: Trait for multiplication assignment.
+//! - `DivAssign`: Trait for division assignment.
+//!
+//! ## Support for Floating-Point Types
+//! The module also includes implementations for interactions between `Perplex` structs and the generic floating point type (`f32` or `f64`).
+
 use super::Perplex;
-use num_traits::{Inv, Num, NumAssign, One, Pow};
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use num_traits::{Num, NumAssign};
+use std::ops::{Add, Div, Mul, Sub};
 use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 
-// Properties of the Perplex Numbers in Fundamental Theorems of Algebra for the Perplexes:
 // binary between Perplex and Perplex
 impl<T: Copy + Num> Add for Perplex<T> {
     type Output = Self;
@@ -142,52 +161,5 @@ impl<T: Copy + NumAssign> DivAssign<T> for Perplex<T> {
     fn div_assign(&mut self, rhs: T) {
         self.t /= rhs;
         self.x /= rhs;
-    }
-}
-
-impl<T: Copy + Num + Neg<Output = T>> Perplex<T> {
-    /// Raises `self` to an unsigned integer power.
-    #[inline]
-    pub fn powu(&self, exp: u32) -> Self {
-        Pow::pow(*self, exp)
-    }
-
-    /// Raises `self` to a signed integer power.
-    #[inline]
-    pub fn powi(&self, exp: i32) -> Option<Self> {
-        Pow::pow(*self, exp)
-    }
-}
-
-impl<T: Copy + Num> Pow<u32> for Perplex<T> {
-    type Output = Perplex<T>;
-    #[inline]
-    fn pow(self, mut exp: u32) -> Self::Output {
-        // iterative version of https://wikipedia.org/wiki/Exponentiation_by_squaring
-        let mut result = Perplex::one();
-        if exp == 0 {
-            return result;
-        }
-        let mut base = self;
-        while exp > 1 {
-            if exp % 2 == 1 {
-                result = result * base;
-            }
-            exp /= 2;
-            base = base * base;
-        }
-        result * base
-    }
-}
-
-impl<T: Copy + Num + Neg<Output = T>> Pow<i32> for Perplex<T> {
-    type Output = Option<Perplex<T>>;
-    #[inline]
-    fn pow(self, exp: i32) -> Self::Output {
-        if exp < 0 {
-            self.inv().map(|z| z.pow(exp.wrapping_neg() as u32))
-        } else {
-            Some(Pow::pow(self, exp as u32))
-        }
     }
 }

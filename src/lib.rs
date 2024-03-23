@@ -3,6 +3,7 @@ mod perplex;
 mod polar;
 #[cfg(feature = "matrix")]
 mod repr_as_matrix;
+mod single_ops;
 
 pub use perplex::Perplex;
 pub use polar::{HyperbolicPolar, HyperbolicSector};

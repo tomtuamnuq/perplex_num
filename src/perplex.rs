@@ -2,7 +2,7 @@ use std::ops::Neg;
 
 use approx::AbsDiffEq;
 use num_traits::float::FloatCore;
-use num_traits::{Float, Inv, MulAdd, MulAddAssign, Num, NumAssign, One, Zero};
+use num_traits::{Float, MulAdd, MulAddAssign, Num, NumAssign, One, Zero};
 
 // The Mathematics of Minkowski Space-Time
 // 4.1 Geometrical Representation of Hyperbolic Numbers
@@ -94,7 +94,7 @@ impl<T: Copy + Num + Neg<Output = T>> Perplex<T> {
     pub fn conj(&self) -> Self {
         Self::new(self.t, -self.x)
     }
-    /// Returns the multiplicative inverse `1/self`, if it exists, or an error if not.
+    /// Returns the multiplicative inverse `1/self`, if it exists, or None if not.
     #[inline]
     pub fn try_inverse(&self) -> Option<Self> {
         let squared_distance = self.squared_distance();
@@ -240,22 +240,6 @@ impl<T: Copy + NumAssign + MulAddAssign> MulAddAssign for Perplex<T> {
         self.t += self.x * other.x + add.t;
         self.x *= other.t;
         self.x += t * other.x + add.x;
-    }
-}
-
-// single ops
-impl<T: Copy + Num + Neg<Output = T>> Neg for Perplex<T> {
-    type Output = Self;
-    #[inline]
-    fn neg(self) -> Self::Output {
-        Self::Output::new(-self.t, -self.x)
-    }
-}
-impl<T: Copy + Num + Neg<Output = T>> Inv for Perplex<T> {
-    type Output = Option<Self>;
-    #[inline]
-    fn inv(self) -> Self::Output {
-        self.try_inverse()
     }
 }
 
