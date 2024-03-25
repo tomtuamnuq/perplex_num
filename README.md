@@ -48,7 +48,7 @@ The inversion of a perplex number, for instance, is only defined for time- or sp
 In the context of perplex numbers, the Klein group $(\{1, h, -1, -h\}, \cdot)$ corresponds to transformations that map perplex numbers to different sectors of the hyperbolic plane. Here's how each element relates to the sectors:
 
 - The identity element **1** leaves a perplex number in the same sector.
-- The element **h** acts as a mirror along the diagonals, effectively flipping the time and space components. It maps right to up.
+- The element **h** acts as a mirror along the diagonals, effectively flipping the time and space components. For instance, it maps right to up.
 - The element **-1** represents a vertical and horizontal mirror, changing the sign of both components. It maps up to down and right to left.
 - The element **-h** combines the effects of **h** and **-1**.
 An interesting feature of the Klein group is that each element is its own multiplicative inverse. More infos about the sectors and the Klein group can be found in Tab. 1 and Appendix B of [Hyperbolic trigonometry in two-dimensional space-time geometry](https://doi.org/10.1393/ncb/i2003-10012-9)
@@ -84,6 +84,10 @@ $$
 
 The argument function is derived from Eq. 4.1.6 in Section 4.1.1 "Hyperbolic Exponential Function and Hyperbolic Polar Transformation" in *The Mathematics of Minkowski Space-Time*. Lines $( x=t )$ and $( x=-t )$ are mapped to $( \infty )$ and $( -\infty )$, respectively, as detailed in Section 4.1 of *New characterizations of the ring of the split-complex numbers and the field C of complex numbers and their comparative analyses*.
 Exponentiation for the `HyperbolicPolar` struct is implemented based on an extended version of Formula 4.6 from the same literature, ensuring a consistent approach across the entire plane.
+
+The accompanying images illustrate the mapping of the hyperbola $H=\{z=(t,x)| t^2-x^2=0.75\}$, depicted in blue, from the right sector $(t>|x|)$ of the standard form on the left to the hyperbolic polar coordinates on the right. Additionally, the images showcase the transformation of $H$ under the power function $z^n$ for $n\in\{-3,-2,-1,2,3\}$, with each power represented by a distinct color. The right plot selectively displays portions of $H$ and its powered counterparts that correspond to the visible region in the left plot.
+
+![Exponentiation of Hyperbolic Polar Transformations](./examples/polar.jpg)
 
 #### Matrix Form
 In matrix form, a perplex number $z = t + xh$  is represented as a symmetric 2x2 matrix:
