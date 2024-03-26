@@ -1,3 +1,5 @@
+#![doc = include_str!("../README.md")]
+
 mod binary_ops;
 #[cfg(feature = "matrix")]
 mod matrix;

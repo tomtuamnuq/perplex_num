@@ -48,8 +48,7 @@ impl<T: Copy + Num> Pow<u32> for Perplex<T> {
     type Output = Perplex<T>;
 
     /// Performs exponentiation by squaring, an efficient algorithm for raising numbers to a power.
-    /// This method is an iterative implementation of the algorithm described at:
-    /// https://wikipedia.org/wiki/Exponentiation_by_squaring
+    /// This method is an iterative implementation of the algorithm described at [Exponentiation by Squaring](https://wikipedia.org/wiki/Exponentiation_by_squaring).
     ///
     /// # Arguments
     /// * `exp` - The exponent to raise the perplex number to.

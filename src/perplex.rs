@@ -9,11 +9,11 @@
 //! - Hyperbolic exponential function as well as the natural logarithm as the inversion.
 //! - Common trigonometric functions in the hyperbolic plane.
 
-use std::ops::Neg;
-
 use approx::AbsDiffEq;
 use num_traits::float::FloatCore;
 use num_traits::{Float, MulAdd, MulAddAssign, Num, NumAssign, One, Zero};
+use std::fmt;
+use std::ops::Neg;
 
 /// The `Perplex` struct is a representation of hyperbolic numbers, also known as split-complex numbers, which consist of two components: a real part (t) and a hyperbolic part (x). These components correspond to the time and space coordinates in Minkowski space-time, respectively. See Sec. 4.1 `Geometrical Representation of Hyperbolic Numbers` in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
 /// The implementation is generic over a type `T`, which allows it to be used with different numeric types (i.e., `f32` or `f64`).
@@ -33,7 +33,18 @@ impl<T> Perplex<T> {
     }
 }
 
-// TODO impl Display t + x h
+impl<T: Copy + fmt::Display> fmt::Display for Perplex<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match f.precision() {
+            Some(p) => write!(f, "{:.*} + {:.*} h", p, self.t, p, self.x,),
+            None => {
+                let t_pretty = format!("{:.1$}", self.t, 2);
+                let x_pretty = format!("{:.1$}", self.x, 2);
+                write!(f, "{} + {} h", t_pretty, x_pretty)
+            }
+        }
+    }
+}
 
 impl<T: AbsDiffEq> AbsDiffEq for Perplex<T>
 where
