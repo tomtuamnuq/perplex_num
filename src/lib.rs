@@ -219,8 +219,19 @@ mod tests {
         let pi = f64::PI();
         let z = Perplex::new(pi, pi / 2.0).sin();
         assert_abs_diff_eq!(z, Perplex::new(0.0, -1.0));
+        assert!(
+            z.tan().is_some(),
+            "Tangens of z should be defined since cos(z) is not light-like!"
+        );
         let zero: Perplex<f64> = Perplex::zero();
         assert_abs_diff_eq!(zero.sinh(), zero);
+        let z = Perplex::new(1.0, 0.0);
+        let expected_tanh = Perplex::new(z.t.tanh(), 0.0);
+        assert_eq!(
+            z.tanh(),
+            Some(expected_tanh),
+            "Tanh of z should be defined since cosh(z) is not light-like!"
+        );
     }
 
     #[test]
@@ -340,6 +351,26 @@ mod tests {
             z1 / 2.0,
             Perplex::new(0.5, 1.0),
             "Componentwise scalar division!"
+        );
+    }
+
+    #[test]
+    fn test_sqrt() {
+        // Test sqrt for a Perplex number in the Right sector (t > |x|)
+        let z_right = Perplex::new(2.0, 1.0);
+        assert!(
+            z_right.sqrt().is_some(),
+            "Sqrt should be defined for Perplex numbers in the Right sector."
+        );
+        // The expected result should be a Perplex number whose square equals z_right
+        if let Some(sqrt_z) = z_right.sqrt() {
+            assert_abs_diff_eq!(sqrt_z.powu(2), z_right, epsilon = 1e-10);
+        }
+        // Test sqrt for a Perplex number in the Left sector (t < -|x|)
+        let z_left = Perplex::new(-2.0, 1.0);
+        assert!(
+            z_left.sqrt().is_none(),
+            "Sqrt should not be defined for Perplex numbers in the Left sector."
         );
     }
 

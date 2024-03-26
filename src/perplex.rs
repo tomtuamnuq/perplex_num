@@ -178,8 +178,30 @@ impl<T: Copy + Float> Perplex<T> {
         })
     }
 
-    // TODO sqrt, log
+    /// Returns the logarithm of `self` with respect to an arbitrary base, if the natural logarithm of `self` exists, according to the formula `ln(self) / ln(base)`.
+    #[inline]
+    pub fn log(self, base: T) -> Option<Self> {
+        self.ln().map(|z| z / base.ln())
+    }
+
     // TODO cbrt, powf, powc, expf for Perplex ?
+
+    /// Computes the square root of `self` if `self` lies in the right sector, or returns `None` if not. Formula is taken from Eq. 2.23 in [New characterizations of the ring of the split-complex numbers and the field C of complex numbers and their comparative analyses](https://doi.org/10.48550/arXiv.2305.04586).
+    #[inline]
+    pub fn sqrt(self) -> Option<Self> {
+        let t_x_add = self.t + self.x;
+        let t_x_sub = self.t - self.x;
+        if t_x_add >= T::zero() && t_x_sub >= T::zero() {
+            let sqrt_add = t_x_add.sqrt();
+            let sqrt_sub = t_x_sub.sqrt();
+            let two = T::one() + T::one();
+            let t = (sqrt_add + sqrt_sub) / two;
+            let x = (sqrt_add - sqrt_sub) / two;
+            Some(Perplex::new(t, x))
+        } else {
+            None
+        }
+    }
 
     /// Computes the sinus (circular trigonometric) of `self`. Formula is taken from Eq. 7.4.6 in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
     #[inline]
@@ -191,6 +213,11 @@ impl<T: Copy + Float> Perplex<T> {
     pub fn cos(self) -> Self {
         Self::new(self.t.cos() * self.x.cos(), self.t.sin() * self.x.sin())
     }
+    /// Computes the tangens (circular trigonometric) of `self` by the formula `sin(self) / cos(self)`. Returns `None` if `cos(self)` is light-like.
+    #[inline]
+    pub fn tan(self) -> Option<Self> {
+        self.sin() / self.cos()
+    }
     /// Computes the sinh (hyperbolic trigonometric) of `self`. Formula is taken from Eq. 7.4.5 in [The Mathematics of Minkowski Space-Time](https://doi.org/10.1007/978-3-7643-8614-6).
     #[inline]
     pub fn sinh(self) -> Self {
@@ -201,8 +228,13 @@ impl<T: Copy + Float> Perplex<T> {
     pub fn cosh(self) -> Self {
         Self::new(self.t.cosh() * self.x.cosh(), self.t.sinh() * self.x.sinh())
     }
+    /// Computes the tanh (hyperbolic trigonometric) of `self` by the formula `sinh(self) / cosh(self)`. Returns `None` if `cosh(self)` is light-like.
+    #[inline]
+    pub fn tanh(self) -> Option<Self> {
+        self.sinh() / self.cosh()
+    }
 
-    // TODO tan, asin, acos, atan, tanh, asinh, acosh, atanh ?
+    // TODO asin, acos, atan, asinh, acosh, atanh ?
 }
 
 impl<T: FloatCore> Perplex<T> {

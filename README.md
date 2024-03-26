@@ -2,10 +2,7 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE-MIT) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE-APACHE) [![minimum rustc 1.76](https://img.shields.io/badge/rustc-1.76+-red.svg)](https://rust-lang.github.io/rfcs/2495-min-rust-version.html)
 
 ## Overview
-`perplex_num` is a Rust crate that implements perplex numbers, with the `num_traits` crate providing the numerical foundations. This library includes a `Perplex` struct for representing perplex numbers 
-
-## Overview
-`perplex_num` is a Rust crate that provides an implementation of perplex numbers, based on the [num_traits](https://docs.rs/num-traits) crate. This library supports various mathematical functions such as `exp`, `ln`, `sinh`, `sin`, `cosh`, and `cos`. Additionally, the crate offers a hyperbolic polar form for representing and manipulating numbers in the hyperbolic plane, as well as a matrix form representation feature based on [nalgebra](https://docs.rs/nalgebra).
+`perplex_num` is a Rust crate that provides an implementation of perplex numbers, based on the numerical abstractions of the [num_traits](https://docs.rs/num-traits) crate. This library supports various mathematical functions such as `pow`, `sqrt`, `exp`, `ln`, `sinh`, `sin`, `cosh`, and `tan`. Additionally, the crate offers a hyperbolic polar form for representing and manipulating numbers in the hyperbolic plane, as well as a matrix form representation feature based on [nalgebra](https://docs.rs/nalgebra).
 
 ## Perplex Numbers
 Perplex numbers, also known as **split-complex**, **double** or **hyperbolic** numbers, are an extension of the real numbers $\mathbb R$ by introducing a new element $h$ with the property that $h^2=1$, which is distinct from the imaginary unit $i$ in complex numbers ($i^2=-1$). $h$ is referred to as **hyperbolic unit**. A perplex number $z$ is expressed as:
@@ -36,7 +33,7 @@ The hyperbolic plane can be divided into four distinct sectors by the intersecti
 - **Left Sector**: The left sector is the mirror image of the right sector, lying to the left of both diagonals. It is defined by $( -t > |x| )$, where the negative time component is greater in magnitude.
 - **Down Sector**: This sector is the mirror image of the up sector, defined by $( -x > |t| )$.
 
-These sectors are important in the study of hyperbolic geometry and perplex numbers, as they determine the nature of the functions and operations that can be performed within each region. Certain functions may only be well-defined or invertible in specific sectors of the hyperbolic plane. The square root of a perplex number, for instance, is only well-defined within the right sector.
+These sectors are important in the study of hyperbolic geometry and perplex numbers, as they determine the nature of the functions and operations that can be performed within each region. Certain functions may only be well-defined or invertible in specific sectors of the hyperbolic plane. The square root of a perplex number, for instance, is only defined within the right sector.
 
 The common categorization of perplex numbers is based on the squared distance. A number is:
 - **time**-like if D(z) > 0, i.e., it lies in the **Right** $(t>|x|)$ or **Left** $(-t>|x|)$ sector 
@@ -55,13 +52,11 @@ An interesting feature of the Klein group is that each element is its own multip
 
 ### Hyperbolic Functions
 
-Building upon the foundational operations such as addition and multiplication, the `perplex_num` crate includes a variety of functions tailored for perplex numbers. These functions are implemented to operate over the complete hyperbolic plane.
+Building upon the foundational operations such as addition and multiplication, the `perplex_num` crate includes a variety of functions tailored for perplex numbers. Most of the functions are implemented to operate over the complete hyperbolic plane.
 
 ![Perplex Functions](./examples/perplex_functions.jpg)
 
-**TODO** add sqrt
-
-The accompanying image provides a graphical representation of these functions, tracing their behavior across a specific hyperbola $H=\{z=(t,x)| t^2-x^2=0.75\}$(blue) in the right sector $(t>|x|)$. A curve of function $f$ corresponds to the image $f(H)$ of the hyperbola, visualizing the mapped perplex numbers $f(z)$.
+The accompanying image provides a graphical representation of a subset of these functions, tracing their behavior across a portion $(0.75 \le t < 3)$ of the hyperbola $H=\{z=(t,x)| t^2-x^2=0.75\}$(blue) in the right sector $(t>|x|)$. A curve of function $f$ corresponds to the image $f(H)$ of the hyperbola, visualizing the mapped perplex numbers $f(z)$.
 
 Multiplication by elements of the **Klein** group allows for the mapping of a perplex number from its original sector to another. This property is utilized in the implementation of functions like the exponential (**exp**) and natural logarithm (**ln**) to ensure consistency across the entire plane. For instance, to compute the exponential of a perplex number, the number is first mapped to the Right Sector, `exp` is applied, and then the result is mapped back to the original sector using the same element (which is the inverse). This approach guarantees that `ln` is the inverse of `exp` and vice versa.
 

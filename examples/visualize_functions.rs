@@ -42,14 +42,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map(|i| d + i as f64 * (t_max as f64 - d) / 100_000.0)
         .for_each(|t| {
             let x = (t * t - d).sqrt();
-            hyperbola_ru.push(Perplex::new(t, x));
-            hyperbola_rd.push(Perplex::new(t, -x));
+            if x.is_finite() {
+                hyperbola_ru.push(Perplex::new(t, x));
+                hyperbola_rd.push(Perplex::new(t, -x));
+            }
         });
 
     let functions: Vec<(&str, PerplexMap, &RGBColor)> = vec![
         (
             "inv",
-            Box::new(|z: &Perplex<f64>| z.try_inverse().expect("z is invertible")),
+            Box::new(|z: &Perplex<f64>| {
+                z.try_inverse()
+                    .expect("z is invertible since d is non-zero!")
+            }),
             &RED,
         ),
         ("sinus", Box::new(|z: &Perplex<f64>| z.sin()), &LIGHTBLUE),
@@ -59,6 +64,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "ln",
             Box::new(|z: &Perplex<f64>| z.ln().expect("The natural logarithm of z exists!")),
             &LIGHTGREEN,
+        ),
+        (
+            "sqrt",
+            Box::new(|z: &Perplex<f64>| z.sqrt().expect("Sqrt of a z in the Right sector exists!")),
+            &MAGENTA,
         ),
     ];
     // Highlight the Right sector
@@ -117,7 +127,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ))?;
         chart.draw_series(iter::once(Text::new(
             label.to_string(),
-            (label_pos.0 + 0.1, label_pos.1),
+            (label_pos.0 + 0.15, label_pos.1 + 0.1),
             font.clone().color(color),
         )))?;
     }
