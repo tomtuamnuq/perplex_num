@@ -1,10 +1,10 @@
 [package]
 authors = ["Tom Krüger"]
-description = "Perplex numbers based on num-traits"
-documentation = "https://github.com/tomtuamnuq/perplex_num"
+description = "Perplex (hyperbolic or split-complex) numbers based on num-traits"
+documentation = "https://docs.rs/perplex_num"
 homepage = "https://github.com/tomtuamnuq/perplex_num"
-keywords = ["mathematics", "numerics", "hyperbolic"]
-categories = ["algorithms", "science"]
+keywords = ["perplex-numbers", "hyperbolic-geometry", "algebra", "split-complex", "mathematics", "numerics", "scientific-computing"]
+categories = ["algorithms", "science::mathematics", "simulation"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/tomtuamnuq/perplex_num"
 name = "perplex_num"

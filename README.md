@@ -62,6 +62,14 @@ fn main() {
 }
 ```
 
+## Coverage
+
+Test coverage report is generated with [cargo tarpaulin](https://github.com/xd009642/tarpaulin) invoke it with:
+```sh
+cargo tarpaulin --verbose --all-targets --skip-clean --exclude-files "examples/*.rs" "benches/*.rs"
+```
+
+
 ## Compatibility
 The `perplex_num` crate is tested for rustc 1.76.
 

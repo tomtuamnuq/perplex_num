@@ -15,3 +15,5 @@ Cargo.lock
 
 # project-based Visual Studio Code settings
 .vscode
+# codecode output
+cobertura.xml
