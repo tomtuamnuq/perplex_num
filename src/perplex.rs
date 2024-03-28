@@ -5,13 +5,13 @@
 //! - Calculation of common distance metrics as well as the squared distance in the hyperbolic plane.
 //! - Determination of the number's nature (time-like, space-like, or light-like) based on its squared distance. See Properties of the Perplex Numbers in [Fundamental Theorems of Algebra for the Perplexes](https://doi.org/10.4169/074683409X475643).
 //! - `AbsDiffEq` trait from the `approx` crate.
-//! - Tertiary operations, constants and `FloatCore` traits from the `num_traits` crate.
+//! - Constants and `FloatCore` traits from the `num_traits` crate.
 //! - Hyperbolic exponential function as well as the natural logarithm as the inversion.
 //! - Common trigonometric functions in the hyperbolic plane.
 
 use approx::AbsDiffEq;
 use num_traits::float::FloatCore;
-use num_traits::{Float, MulAdd, MulAddAssign, Num, NumAssign, One, Zero};
+use num_traits::{Float, Num, One, Zero};
 use std::fmt;
 use std::ops::Neg;
 
@@ -33,14 +33,19 @@ impl<T> Perplex<T> {
     }
 }
 
-impl<T: Copy + fmt::Display> fmt::Display for Perplex<T> {
+impl<T: Copy + Neg<Output = T> + PartialOrd + Num + fmt::Display> fmt::Display for Perplex<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let (x, sign) = if self.x < T::zero() {
+            (-self.x, "-")
+        } else {
+            (self.x, "+")
+        };
         match f.precision() {
-            Some(p) => write!(f, "{:.*} + {:.*} h", p, self.t, p, self.x,),
+            Some(p) => write!(f, "{:.*} {sign} {:.*} h", p, self.t, p, x,),
             None => {
                 let t_pretty = format!("{:.1$}", self.t, 2);
-                let x_pretty = format!("{:.1$}", self.x, 2);
-                write!(f, "{} + {} h", t_pretty, x_pretty)
+                let x_pretty = format!("{:.1$}", x, 2);
+                write!(f, "{} {sign} {} h", t_pretty, x_pretty)
             }
         }
     }
@@ -66,6 +71,14 @@ impl<T: Copy + Num> Default for Perplex<T> {
     #[inline]
     fn default() -> Self {
         Self::new(T::one(), T::zero())
+    }
+}
+
+impl<T: Copy + Num> From<T> for Perplex<T> {
+    /// Conversion of a number `t` into a Perplex yields time-component `t` with zero space component.
+    #[inline]
+    fn from(t: T) -> Self {
+        Self::new(t, T::zero())
     }
 }
 
@@ -274,33 +287,6 @@ impl<T: FloatCore> Perplex<T> {
     }
 }
 
-impl<T: Copy + Num> From<T> for Perplex<T> {
-    #[inline]
-    fn from(t: T) -> Self {
-        Self::new(t, T::zero())
-    }
-}
-
-// tertiary ops between three Perplex
-impl<T: Copy + Num + MulAdd<Output = T>> MulAdd<Perplex<T>> for Perplex<T> {
-    type Output = Perplex<T>;
-    #[inline]
-    fn mul_add(self, other: Perplex<T>, add: Perplex<T>) -> Self {
-        let t = self.t * other.t + self.x * other.x + add.t;
-        let x = other.t * self.x + self.t * other.x + add.x;
-        Self::new(t, x)
-    }
-}
-impl<T: Copy + NumAssign + MulAddAssign> MulAddAssign for Perplex<T> {
-    fn mul_add_assign(&mut self, other: Self, add: Self) {
-        let t = self.t;
-        self.t *= other.t;
-        self.t += self.x * other.x + add.t;
-        self.x *= other.t;
-        self.x += t * other.x + add.x;
-    }
-}
-
 // constants
 impl<T: Copy + Num> Zero for Perplex<T> {
     #[inline]
@@ -335,5 +321,202 @@ impl<T: Copy + Num> One for Perplex<T> {
     fn set_one(&mut self) {
         self.t.set_one();
         self.x.set_zero();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use approx::assert_abs_diff_eq;
+    use num_traits::*;
+
+    #[test]
+    fn test_display() {
+        let z = Perplex::new(1.1235, 1.10);
+        assert_eq!(
+            format!("{:.3}", z),
+            String::from("1.123 + 1.100 h"),
+            "Precision specifier produces 3 decimal places!"
+        );
+        assert_eq!(
+            format!("{:.1}", z),
+            String::from("1.1 + 1.1 h"),
+            "Precision specifier produces 1 decimal place!"
+        );
+        let z = Perplex::new(2.0, -1.0);
+        assert_eq!(z.to_string(), String::from("2.00 - 1.00 h"), "Negation sign is used for negative space component! Per default, fmt produces two decimal places!");
+    }
+    #[test]
+    fn test_components() {
+        let z = Perplex::new(1.1, 2.2);
+        assert_eq!(z.real(), 1.1);
+        assert_eq!(z.hyperbolic(), 2.2);
+        assert_eq!(z.scale(2.0), Perplex::new(2.2, 4.4));
+        assert_eq!(Perplex::from(2.0), Perplex::new(2.0, 0.0), "Converting a number t into a Perplex yields time-component t and zero space component!")
+    }
+    #[test]
+    fn test_norm() {
+        let z = Perplex::new(2.0, -1.0);
+        assert!(z.is_time_like());
+        assert_eq!(z.modulus(), f64::sqrt(3.0), "2 - h has a norm of √3");
+        let z = Perplex::new(1.0, -1.0);
+        assert!(z.is_light_like());
+        assert_eq!(z.magnitude(), f64::zero(), "1 - h has a norm of zero");
+        let z = Perplex::new(-1.0, 2.0);
+        assert!(z.is_space_like());
+        assert_eq!(z.norm(), f64::sqrt(3.0), "-1 + 2h has a norm of √3");
+        assert_eq!(z.l1_norm(), 3.0, "-1 + 2h has a l1 norm of 3");
+        assert_eq!(z.l2_norm(), f64::sqrt(5.0), "-1 + 2h has a l2 norm of √5");
+        assert_eq!(z.max_norm(), 2.0, "-1 + 2h has a max norm of 2");
+    }
+
+    #[test]
+    fn test_log() {
+        let z = Perplex::new(2.0, 1.0);
+        let z_ln = z.ln().unwrap();
+        let z_log = z.log(2.0).unwrap();
+        assert_eq!(z_log, z_ln / f64::ln(2.0));
+    }
+    #[test]
+    fn test_logarithm_exponential() {
+        let z = Perplex::new(2.0, 1.0); // Right-Sector
+        let ln_result = z.ln();
+        assert!(
+            ln_result.is_some(),
+            "Natural logarithm is defined for time-like 2 + h!"
+        );
+        let z_ln_exp = ln_result.unwrap().exp();
+        assert_abs_diff_eq!(z_ln_exp, z);
+
+        let z = Perplex::new(-2.0, 1.0); // Left-Sector
+        let ln_result = z.ln();
+        assert!(
+            ln_result.is_some(),
+            "Natural logarithm is defined for time-like -2 + h!"
+        );
+        let z_ln_exp = ln_result.unwrap().exp();
+        assert_abs_diff_eq!(z_ln_exp, z);
+
+        let z = Perplex::new(1.0, 2.0); // Up-Sector
+        let ln_result = z.ln();
+        assert!(
+            ln_result.is_some(),
+            "Natural logarithm is defined for space-like 1 + 2h!"
+        );
+        let z_ln_exp = ln_result.unwrap().exp();
+        assert_abs_diff_eq!(z_ln_exp, z);
+
+        let z = Perplex::new(1.0, -2.0); // Down-Sector
+        let ln_result = z.ln();
+        assert!(
+            ln_result.is_some(),
+            "Natural logarithm is defined for space-like 1 - 2h!"
+        );
+        let z_ln_exp = ln_result.unwrap().exp();
+        assert_abs_diff_eq!(z_ln_exp, z);
+    }
+    #[test]
+    fn test_exponential_logarithm() {
+        let z = Perplex::new(2.0, 1.0); // Right-Sector
+        assert_abs_diff_eq!(z.exp().ln().unwrap(), z, epsilon = 0.00001);
+        let z = Perplex::new(-2.0, 1.0); // Left-Sector
+        assert_abs_diff_eq!(z.exp().ln().unwrap(), z, epsilon = 0.00001);
+        let z = Perplex::new(1.0, 2.0); // Up-Sector
+        assert_abs_diff_eq!(z.exp().ln().unwrap(), z, epsilon = 0.00001);
+        let z = Perplex::new(1.0, -2.0); // Down-Sector
+        assert_abs_diff_eq!(z.exp().ln().unwrap(), z, epsilon = 0.00001);
+    }
+
+    #[test]
+    fn test_trigonometric() {
+        let pi = f64::PI();
+        let z = Perplex::new(pi, pi / 2.0).sin();
+        assert_abs_diff_eq!(z, Perplex::new(0.0, -1.0));
+        assert!(
+            z.tan().is_some(),
+            "Tangens of z should be defined since cos(z) is not light-like!"
+        );
+        let zero: Perplex<f64> = Perplex::zero();
+        assert_abs_diff_eq!(zero.sinh(), zero);
+        let z = Perplex::new(1.0, 0.0);
+        let expected_tanh = Perplex::new(z.t.tanh(), 0.0);
+        assert_eq!(
+            z.tanh(),
+            Some(expected_tanh),
+            "Tanh of z should be defined since cosh(z) is not light-like!"
+        );
+    }
+
+    #[test]
+    fn test_sqrt() {
+        // Test sqrt for a Perplex number in the Right sector (t > |x|)
+        let z_right = Perplex::new(2.0, 1.0);
+        assert!(
+            z_right.sqrt().is_some(),
+            "Sqrt should be defined for Perplex numbers in the Right sector."
+        );
+        // The expected result should be a Perplex number whose square equals z_right
+        if let Some(sqrt_z) = z_right.sqrt() {
+            assert_abs_diff_eq!(sqrt_z.powu(2), z_right, epsilon = 1e-10);
+        }
+        // Test sqrt for a Perplex number in the Left sector (t < -|x|)
+        let z_left = Perplex::new(-2.0, 1.0);
+        assert!(
+            z_left.sqrt().is_none(),
+            "Sqrt should not be defined for Perplex numbers in the Left sector."
+        );
+    }
+
+    #[test]
+    fn test_core() {
+        let z = Perplex::new(1.0, 2.0);
+        assert!(
+            z.is_finite(),
+            "Perplex number with finite components is finite!"
+        );
+        assert!(
+            z.is_normal(),
+            "Perplex number with finite components is normal!"
+        );
+        assert!(
+            !z.is_infinite(),
+            "Perplex number with finite components is not infinite!"
+        );
+        assert!(
+            !z.is_nan(),
+            "Perplex number with finite components is not NAN!"
+        );
+        let z = Perplex::new(f64::NAN, 1.0);
+        assert!(z.is_nan(), "Perplex number with a NaN component is NAN!")
+    }
+    #[test]
+    fn test_const() {
+        let mut z = Perplex::new(0.0, 2.0);
+        assert!(!z.is_one(), "Perplex number a zero component is not one!");
+        assert!(
+            !z.is_zero(),
+            "Perplex number with non-zero component is not zero!"
+        );
+        z.set_one();
+        assert_eq!(Perplex::one(), z, "Perplex number set to one equals one!");
+        assert!(z.is_one(), "Perplex number set to one is one!");
+        z.set_zero();
+        assert_eq!(
+            Perplex::zero(),
+            z,
+            "Perplex number set to zero equals zero!"
+        );
+        assert!(z.is_zero(), "Perplex number set to zero is zero!");
+
+        assert!(
+            !z.is_infinite(),
+            "Perplex number with finite components is not infinite!"
+        );
+        assert!(
+            !z.is_nan(),
+            "Perplex number with finite components is not NAN!"
+        );
+        let z = Perplex::new(f64::NAN, 1.0);
+        assert!(z.is_nan(), "Perplex number with a NaN component is NAN!")
     }
 }

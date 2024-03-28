@@ -247,8 +247,8 @@ impl<T: Copy + Float> Pow<u32> for HyperbolicPolar<T> {
         match exp {
             0 => Self::default(),
             1 => self,
-            n => {
-                let n = n as i32;
+            _ => {
+                let n = exp as i32;
                 let Self { rho, theta, sector } = self;
                 if let HyperbolicSector::Diagonal(t) = sector {
                     let t_new = t * (t + t).powi(n - 1); // t^n * 2^{n-1}
@@ -271,5 +271,144 @@ impl<T: Copy + Float> Pow<u32> for HyperbolicPolar<T> {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use approx::assert_abs_diff_eq;
+    use num_traits::*;
+    #[test]
+    fn test_polar() {
+        assert_abs_diff_eq!(
+            Perplex::<f64>::default(),
+            Perplex::from(HyperbolicPolar::default()),
+            epsilon = 0.0001
+        );
+
+        let z = Perplex::new(1.0, 1.0); // Diagonal x=t
+        assert!(z.is_light_like(), "1 + h is light-like!");
+        assert_eq!(z.arg(), f64::infinity(), "Argument of 1 + h is infinity!");
+        assert!(
+            z.klein().is_none(),
+            "Klein is not defined for light-like numbers!"
+        );
+        assert_eq!(
+            HyperbolicPolar::from(z),
+            HyperbolicPolar {
+                rho: 0.0,
+                theta: f64::infinity(),
+                sector: HyperbolicSector::Diagonal(1.0)
+            },
+            "Polar form of 1 + h!"
+        );
+        assert_abs_diff_eq!(z, Perplex::from(HyperbolicPolar::from(z)), epsilon = 0.0001);
+
+        let z = Perplex::new(1.0, -1.0); // Diagonal x=-t
+        assert!(z.is_light_like(), "1 - h is light-like!");
+        assert_eq!(
+            z.arg(),
+            f64::neg_infinity(),
+            "Argument of 1 - h is  negative infinity!"
+        );
+        assert!(
+            z.klein().is_none(),
+            "Klein is not defined for light-like numbers!"
+        );
+        assert_eq!(
+            HyperbolicPolar::from(z),
+            HyperbolicPolar {
+                rho: 0.0,
+                theta: f64::neg_infinity(),
+                sector: HyperbolicSector::Diagonal(1.0)
+            },
+            "Polar form of 1 - h!"
+        );
+        assert_abs_diff_eq!(z, Perplex::from(HyperbolicPolar::from(z)), epsilon = 0.0001);
+
+        let z = Perplex::new(2.0, 1.0); // Right-Sector
+        assert!(z.is_time_like(), "2 + h is time-like!");
+        assert_ne!(z.arg(), 0.0, "2 + h has a non-zero argument!");
+        assert_eq!(
+            z.klein().unwrap(),
+            Perplex::new(1.0, 0.0),
+            "2 + h is in the right-sector!"
+        );
+        assert_abs_diff_eq!(z, Perplex::from(HyperbolicPolar::from(z)), epsilon = 0.0001);
+
+        let z = Perplex::new(-2.0, 1.0); // Left-Sector
+        assert!(z.is_time_like(), "-2 + h is time-like!");
+        assert_ne!(z.arg(), 0.0, "-2 + h has a non-zero argument!");
+        assert_eq!(
+            z.klein().unwrap(),
+            Perplex::new(-1.0, 0.0),
+            "-2 + h is in the left-sector!"
+        );
+        assert_abs_diff_eq!(z, Perplex::from(HyperbolicPolar::from(z)), epsilon = 0.0001);
+
+        let z = Perplex::new(1.0, 2.0); // Up-Sector
+        assert!(z.is_space_like(), "1 + 2h is space-like!");
+        assert_ne!(z.arg(), 0.0, "1 + 2h has a non-zero argument!");
+        assert_eq!(
+            z.klein().unwrap(),
+            Perplex::new(0.0, 1.0),
+            "1 + 2h is in the up-sector!"
+        );
+        assert_abs_diff_eq!(z, Perplex::from(HyperbolicPolar::from(z)), epsilon = 0.0001);
+
+        let z = Perplex::new(1.0, -2.0); // Down-Sector
+        assert!(z.is_space_like(), "1 - 2h is space-like!");
+        assert_ne!(z.arg(), 0.0, "1 - 2h has a non-zero argument!");
+        assert_eq!(
+            z.klein().unwrap(),
+            Perplex::new(0.0, -1.0),
+            "1 - 2h is in the down-sector!"
+        );
+        assert_abs_diff_eq!(z, Perplex::from(HyperbolicPolar::from(z)), epsilon = 0.0001);
+
+        let z = Perplex::cis(f64::PI() / 2.0);
+        assert_abs_diff_eq!(z, Perplex::from(HyperbolicPolar::from(z)), epsilon = 0.0001);
+    }
+
+    fn polar_mul_test_loop(z: Perplex<f64>) {
+        let polar = HyperbolicPolar::from(z);
+        assert_abs_diff_eq!(Perplex::default(), Perplex::from(polar.pow(0)));
+        assert_abs_diff_eq!(z, Perplex::from(polar.pow(1)), epsilon = 0.0001);
+        assert_abs_diff_eq!(z * z, Perplex::from(polar.pow(2)), epsilon = 0.0001);
+        assert_abs_diff_eq!(z * z * z, Perplex::from(polar.pow(3)), epsilon = 0.0001);
+        assert_abs_diff_eq!(z * z * z * z, Perplex::from(polar.pow(4)), epsilon = 0.0001);
+    }
+
+    #[test]
+    fn test_polar_multiplication() {
+        let z = Perplex::new(1.0, 1.0); // Diagonal x=t
+        polar_mul_test_loop(z);
+        let z = Perplex::new(1.0, -1.0); // Diagonal x=-t
+        polar_mul_test_loop(z);
+        let z = Perplex::new(2.0, 1.0); // Right-Sector
+        polar_mul_test_loop(z);
+        polar_mul_test_loop(z.inv().unwrap());
+        let z = Perplex::new(-2.0, 1.0); // Left-Sector
+        polar_mul_test_loop(z);
+        polar_mul_test_loop(z.inv().unwrap());
+        let z = Perplex::new(1.0, 2.0); // Up-Sector
+        polar_mul_test_loop(z);
+        polar_mul_test_loop(z.inv().unwrap());
+        let z = Perplex::new(1.0, -2.0); // Down-Sector
+        polar_mul_test_loop(z);
+        polar_mul_test_loop(z.inv().unwrap());
+        let z = Perplex::cis(f64::PI() / 2.0);
+        polar_mul_test_loop(z);
+        polar_mul_test_loop(z.inv().unwrap());
+    }
+    #[test]
+    fn test_polar_sector() {
+        let perplex = Perplex::new(1.0, 0.5);
+        assert_eq!(perplex.sector(), HyperbolicSector::Right);
+        let polar = perplex.polar();
+        assert_eq!(polar.rho, f64::sqrt(0.75));
+        assert_eq!(polar.theta, perplex.arg());
+        assert_eq!(polar.sector, HyperbolicSector::Right);
     }
 }

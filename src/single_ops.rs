@@ -99,3 +99,87 @@ impl<T: Copy + Num + Neg<Output = T>> Pow<i32> for Perplex<T> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use approx::assert_abs_diff_eq;
+    use num_traits::*;
+    #[test]
+    fn test_inv() {
+        let z = Perplex::new(2.0, -1.0);
+        let inv_result = z.inv();
+        assert!(inv_result.is_some(), "2 - h is invertible!");
+        assert_eq!(inv_result.unwrap(), Perplex::new(2.0 / 3.0, 1.0 / 3.0));
+    }
+
+    #[test]
+    fn test_power_u32() {
+        let z = Perplex::new(1.0, -1.0);
+        assert_eq!(
+            z.powu(0),
+            Perplex::new(1.0, 0.0),
+            "Power 0 yields neutral element of multiplication!"
+        );
+        assert_eq!(
+            z * z,
+            Perplex::new(2.0, -2.0),
+            "Multiplication with itself!"
+        );
+        assert_eq!(
+            z.powu(2),
+            Perplex::new(2.0, -2.0),
+            "Power 2 yields multiplication with itself!"
+        );
+        assert_eq!(
+            z.powu(3),
+            Perplex::new(4.0, -4.0),
+            "Power 3 multiplication result!"
+        );
+        let z = Perplex::new(f64::PI(), -0.123);
+        assert_eq!(z.powu(3), z * z * z, "Power 3 multiplication result!");
+        assert_abs_diff_eq!(
+            z.powu(8),
+            z * z * z * z * z * z * z * z,
+            epsilon = 0.0000001
+        );
+        assert_abs_diff_eq!(z.powu(7), z * z * z * z * z * z * z, epsilon = 0.0000001);
+    }
+    #[test]
+    fn test_power_i32() {
+        let z = Perplex::new(1.0, -1.0);
+        assert!(z.powi(-2).is_none(), " 1 - h is not invertibe!");
+        let z = Perplex::new(2.0, 1.0);
+        let z_inv = z.try_inverse().unwrap();
+        assert_eq!(
+            z_inv.powi(2).unwrap(), // (2/3 - h / 3)^2
+            Perplex::new(5.0 / 9.0, -4.0 / 9.0),
+            "Multiplication of inverse with itself!"
+        );
+        assert_eq!(
+            z.powi(-2).unwrap(),
+            Perplex::new(5.0 / 9.0, -4.0 / 9.0),
+            "Power -2 yields multiplication of inverse with itself!"
+        );
+        assert_eq!(
+            z.powi(-3).unwrap(),
+            Perplex::new(14.0 / 27.0, -13.0 / 27.0),
+            "Power -3 multiplication result!"
+        );
+        let z = Perplex::new(f64::PI(), -0.123);
+        let z_inv = z.try_inverse().unwrap();
+        assert_eq!(
+            z.powi(-3).unwrap(),
+            z_inv * z_inv * z_inv,
+            "Power -3 multiplication result!"
+        );
+        assert_abs_diff_eq!(
+            z.powi(-8).unwrap(),
+            z_inv * z_inv * z_inv * z_inv * z_inv * z_inv * z_inv * z_inv,
+        );
+        assert_abs_diff_eq!(
+            z.powi(-7).unwrap(),
+            z_inv * z_inv * z_inv * z_inv * z_inv * z_inv * z_inv,
+        );
+    }
+}

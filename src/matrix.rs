@@ -42,3 +42,23 @@ impl<T: Copy + RealField> Perplex<T> {
         PerplexMatrixForm::new(t, x, x, t)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_matrix() {
+        let (z1, z2) = (Perplex::new(1.0, 0.5), Perplex::new(-1.0, -2.0));
+        let (m1, m2) = (z1.as_matrix_form(), PerplexMatrixForm::from(z2));
+        assert_eq!(
+            z1 + z2,
+            Perplex::from(m1 + m2),
+            "Matrix addition corresponds to addition of perplex numbers!"
+        );
+        assert_eq!(
+            z1 * z2,
+            Perplex::from(m1 * m2),
+            "Matrix multiplication corresponds to multiplication of perplex numbers!"
+        );
+    }
+}

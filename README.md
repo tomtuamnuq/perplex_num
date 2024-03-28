@@ -1,5 +1,5 @@
 # perplex_num
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE-MIT) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE-APACHE) [![minimum rustc 1.76](https://img.shields.io/badge/rustc-1.76+-red.svg)](https://rust-lang.github.io/rfcs/2495-min-rust-version.html)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE-MIT) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE-APACHE) [![minimum rustc 1.76](https://img.shields.io/badge/rustc-1.76+-red.svg)](https://rust-lang.github.io/rfcs/2495-min-rust-version.html)[![codecov](https://codecov.io/gh/tomtuamnuq/perplex_num/graph/badge.svg?token=EGEEP9PBHX)](https://codecov.io/gh/tomtuamnuq/perplex_num)
 
 ## Overview
 `perplex_num` is a Rust crate that provides an implementation of perplex numbers, based on the numerical abstractions of the [num_traits](https://docs.rs/num-traits) crate. This library supports various mathematical functions such as `pow`, `sqrt`, `exp`, `ln`, `sinh`, `sin`, `cosh`, and `tan`. Additionally, the crate offers a hyperbolic polar form for representing and manipulating numbers in the hyperbolic plane, as well as a matrix form representation feature based on [nalgebra](https://docs.rs/nalgebra).
@@ -64,7 +64,7 @@ fn main() {
 
 ## Coverage
 
-Test coverage report is generated with [cargo tarpaulin](https://github.com/xd009642/tarpaulin) invoke it with:
+Test coverage report is generated with [cargo tarpaulin](https://github.com/xd009642/tarpaulin). Invoke it with:
 ```sh
 cargo tarpaulin --verbose --all-targets --skip-clean --exclude-files "examples/*.rs" "benches/*.rs"
 ```
