@@ -105,8 +105,6 @@ impl<T: Copy + NumAssign> DivAssign for Perplex<T> {
     }
 }
 
-// TODO binary ops between references ? use copy semantics
-
 // binary between Perplex and T
 impl<T: Copy + Num> Add<T> for Perplex<T> {
     type Output = Perplex<T>;

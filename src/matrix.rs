@@ -5,7 +5,8 @@
 //! ## Overview
 //! The `PerplexMatrixForm` type is a type alias for a 2x2 matrix from the `nalgebra` crate, representing the matrix form of a perplex number. This module includes conversions between the `Perplex` struct and its matrix representation.
 //! The matrix representation of a perplex number is symmetric, with the real part on the diagonal and the hyperbolic part on the off-diagonal. This symmetry reflects the properties of perplex numbers regarding the hyperbolic unit.
-//! Addition, multiplication as well as inversion of perplex numbers correspond to the matrix operations.
+//! Addition, multiplication, as well as inversion of perplex numbers correspond to the matrix operations.
+//!
 //! ## Example
 //! ```rust
 //! use perplex_num::Perplex;
@@ -19,13 +20,17 @@
 
 use super::perplex::Perplex;
 use nalgebra::{Matrix2, RealField};
-pub type PerplexMatrixForm<T> = Matrix2<T>; // TODO symmetric ? limit operations to the ones defined on a wrapping struct ?
+
+/// A type alias for a 2x2 matrix from `nalgebra`, representing a perplex number as a matrix.
+pub type PerplexMatrixForm<T> = Matrix2<T>;
+
 impl<T: Copy + RealField> From<PerplexMatrixForm<T>> for Perplex<T> {
     /// Converts a matrix form to a perplex number, assuming a symmetric matrix.
     fn from(m: PerplexMatrixForm<T>) -> Self {
         Self { t: m.m11, x: m.m12 }
     }
 }
+
 impl<T: Copy + RealField> From<Perplex<T>> for PerplexMatrixForm<T> {
     /// Returns the matrix form of the perplex number.
     fn from(z: Perplex<T>) -> Self {

@@ -208,8 +208,6 @@ impl<T: Copy + Float> Perplex<T> {
         self.ln().map(|z| z / base.ln())
     }
 
-    // TODO cbrt, powf, powc, expf for Perplex ?
-
     /// Computes the square root of `self` if `self` lies in the right sector, or returns `None` if not. Formula is taken from Eq. 2.23 in [New characterizations of the ring of the split-complex numbers and the field C of complex numbers and their comparative analyses](https://doi.org/10.48550/arXiv.2305.04586).
     #[inline]
     pub fn sqrt(self) -> Option<Self> {
@@ -257,8 +255,6 @@ impl<T: Copy + Float> Perplex<T> {
     pub fn tanh(self) -> Option<Self> {
         self.sinh() / self.cosh()
     }
-
-    // TODO asin, acos, atan, asinh, acosh, atanh ?
 }
 
 impl<T: FloatCore> Perplex<T> {
